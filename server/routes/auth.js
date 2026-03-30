@@ -1,8 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const User = require('../models/User');
 const { verifyToken } = require('../middleware/authMiddleware');
 
 // Регистрация
@@ -10,19 +10,15 @@ router.post('/register', async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        if (!email || !password) {
-            return res.status(400).json({ message: 'Email and password required' });
-        }
-
-        const existingUser = await User.findOne({ email });
+        const existingUser = await User.findOne({ where: { email } });
         if (existingUser) {
             return res.status(400).json({ message: 'User already exists' });
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        await User.create({ email, password: hashedPassword });
+        const user = await User.create({ email, password: hashedPassword });
         
-        res.status(201).json({ message: 'User created successfully' });
+        res.status(201).json({ message: 'User created' });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -33,7 +29,7 @@ router.post('/login', async (req, res) => {
     try {
         const { email, password } = req.body;
         
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ where: { email } });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
@@ -44,22 +40,18 @@ router.post('/login', async (req, res) => {
         }
 
         const token = jwt.sign(
-            { id: user._id, role: user.role }, 
+            { id: user.id, role: user.role }, 
             process.env.JWT_SECRET, 
             { expiresIn: '1h' }
         );
 
         res.cookie('token', token, {
             httpOnly: true,
-            maxAge: 3600000, // 1 час
+            maxAge: 3600000,
             sameSite: 'lax'
         });
 
-        res.json({ 
-            message: 'Logged in', 
-            role: user.role, 
-            email: user.email 
-        });
+        res.json({ message: 'Logged in', role: user.role, email: user.email });
     } catch (e) {
         res.status(500).json({ error: e.message });
     }
@@ -68,13 +60,15 @@ router.post('/login', async (req, res) => {
 // Логаут
 router.post('/logout', (req, res) => {
     res.clearCookie('token');
-    res.json({ message: 'Logged out successfully' });
+    res.json({ message: 'Logged out' });
 });
 
 // Получить текущего пользователя
 router.get('/me', verifyToken, async (req, res) => {
     try {
-        const user = await User.findById(req.user.id).select('-password');
+        const user = await User.findByPk(req.user.id, {
+            attributes: ['id', 'email', 'role']
+        });
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }

@@ -1,11 +1,10 @@
 const jwt = require('jsonwebtoken');
 
-// Проверка токена (авторизация)
 const verifyToken = (req, res, next) => {
     const token = req.cookies.token;
     
     if (!token) {
-        return res.status(401).json({ message: 'Unauthorized - No token' });
+        return res.status(401).json({ message: 'Unauthorized' });
     }
 
     try {
@@ -17,7 +16,6 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-// Проверка роли админа
 const verifyAdmin = (req, res, next) => {
     if (req.user.role !== 'admin') {
         return res.status(403).json({ message: 'Access denied: Admin only' });

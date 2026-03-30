@@ -1,14 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const CartItem = require('../models/CartItem');
+const Product = require('../models/Product');
 const { verifyToken } = require('../middleware/authMiddleware');
 
-// Получить корзину пользователя
+// Получить корзину
 router.get('/', verifyToken, async (req, res) => {
     try {
-        const items = await CartItem.find({ userId: req.user.id })
-            .populate('productId')
-            .sort({ createdAt: -1 });
+        const items = await CartItem.findAll({
+            where: { userId: req.user.id },
+            include: [Product],
+            order: [['createdAt', 'DESC']]
+        });
         res.json(items);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -20,41 +23,20 @@ router.post('/add', verifyToken, async (req, res) => {
     try {
         const { productId, quantity } = req.body;
         
-        if (!productId) {
-            return res.status(400).json({ message: 'Product ID required' });
-        }
-
-        let item = await CartItem.findOne({ 
-            userId: req.user.id, 
-            productId 
+        let item = await CartItem.findOne({
+            where: { userId: req.user.id, productId }
         });
         
         if (item) {
             item.quantity += quantity || 1;
             await item.save();
         } else {
-            item = await CartItem.create({ 
-                userId: req.user.id, 
-                productId, 
-                quantity: quantity || 1 
+            item = await CartItem.create({
+                userId: req.user.id,
+                productId,
+                quantity: quantity || 1
             });
         }
-        
-        res.json(item);
-    } catch (err) {
-        res.status(500).json({ error: err.message });
-    }
-});
-
-// Обновить количество
-router.put('/:id', verifyToken, async (req, res) => {
-    try {
-        const { quantity } = req.body;
-        const item = await CartItem.findOneAndUpdate(
-            { _id: req.params.id, userId: req.user.id },
-            { quantity },
-            { new: true }
-        ).populate('productId');
         
         res.json(item);
     } catch (err) {
@@ -65,9 +47,8 @@ router.put('/:id', verifyToken, async (req, res) => {
 // Удалить из корзины
 router.delete('/:id', verifyToken, async (req, res) => {
     try {
-        await CartItem.findOneAndDelete({ 
-            _id: req.params.id, 
-            userId: req.user.id 
+        await CartItem.destroy({
+            where: { id: req.params.id, userId: req.user.id }
         });
         res.json({ message: 'Item removed' });
     } catch (err) {
@@ -78,7 +59,7 @@ router.delete('/:id', verifyToken, async (req, res) => {
 // Очистить корзину
 router.delete('/clear', verifyToken, async (req, res) => {
     try {
-        await CartItem.deleteMany({ userId: req.user.id });
+        await CartItem.destroy({ where: { userId: req.user.id } });
         res.json({ message: 'Cart cleared' });
     } catch (err) {
         res.status(500).json({ error: err.message });
