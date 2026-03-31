@@ -1,19 +1,12 @@
 const express = require('express');
 const router = express.Router();
-const Product = require('../models/Product');
-const { verifyAdmin } = require('../middleware/authMiddleware');
+const productService = require('../services/productService'); // <-- Импортируем сервис
+const { verifyAdmin, verifyToken } = require('../middleware/authMiddleware');
 
-// Получить все товары
+// Получить все товары (Можно оставить публичным или добавить verifyToken по требованию)
 router.get('/', async (req, res) => {
     try {
-        const { category, artist, preorder } = req.query;
-        let where = {};
-        
-        if (category) where.category = category;
-        if (artist) where.artist = { [require('sequelize').Op.iLike]: `%${artist}%` };
-        if (preorder) where.isPreorder = preorder === 'true';
-        
-        const products = await Product.findAll({ where, order: [['createdAt', 'DESC']] });
+        const products = await productService.getAll(req.query);
         res.json(products);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -23,33 +16,40 @@ router.get('/', async (req, res) => {
 // Получить один товар
 router.get('/:id', async (req, res) => {
     try {
-        const product = await Product.findByPk(req.params.id);
-        if (!product) {
-            return res.status(404).json({ message: 'Product not found' });
-        }
+        const product = await productService.getById(req.params.id);
         res.json(product);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(err.message === 'Product not found' ? 404 : 500).json({ error: err.message });
     }
 });
 
-// Создать товар (админ)
+// Создать товар (ТОЛЬКО АДМИН)
 router.post('/', verifyAdmin, async (req, res) => {
     try {
-        const product = await Product.create(req.body);
+        const product = await productService.create(req.body);
         res.status(201).json(product);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 });
 
-// Удалить товар (админ)
+// Обновить товар (ТОЛЬКО АДМИН)
+router.put('/:id', verifyAdmin, async (req, res) => {
+    try {
+        const product = await productService.update(req.params.id, req.body);
+        res.json(product);
+    } catch (err) {
+        res.status(err.message === 'Product not found' ? 404 : 500).json({ error: err.message });
+    }
+});
+
+// Удалить товар (ТОЛЬКО АДМИН)
 router.delete('/:id', verifyAdmin, async (req, res) => {
     try {
-        await Product.destroy({ where: { id: req.params.id } });
+        await productService.delete(req.params.id);
         res.json({ message: 'Product deleted' });
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        res.status(err.message === 'Product not found' ? 404 : 500).json({ error: err.message });
     }
 });
 

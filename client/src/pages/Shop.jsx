@@ -33,10 +33,11 @@ const Shop = () => {
         }
         
         try {
-            await cartService.addToCart(productId);
-            alert('Добавлено в корзину! 💜');
+            await cartService.addToCart(productId, 1);
+            alert('✅ Добавлено в корзину!');
         } catch (err) {
-            alert('Ошибка при добавлении в корзину');
+            console.error('Cart error:', err);
+            alert('❌ Ошибка при добавлении в корзину');
         }
     };
 
@@ -56,12 +57,12 @@ const Shop = () => {
                 alignItems: 'center',
                 marginBottom: '30px'
             }}>
-                <h1>🇰🇷 K-Pop Merch Store</h1>
+                <h1>🇰 K-Pop Merch Store</h1>
                 
                 <select
                     value={filter}
                     onChange={e => setFilter(e.target.value)}
-                    style={{ padding: '10px', fontSize: '14px' }}
+                    style={{ padding: '10px', fontSize: '14px', borderRadius: '5px' }}
                 >
                     {categories.map(cat => (
                         <option key={cat.value} value={cat.value}>
@@ -83,7 +84,7 @@ const Shop = () => {
                 }}>
                     {products.map(product => (
                         <div
-                            key={product._id}
+                            key={product._id || product.id}
                             style={{
                                 background: 'white',
                                 borderRadius: '10px',
@@ -141,17 +142,18 @@ const Shop = () => {
                                 </span>
                                 
                                 <button
-                                    onClick={() => handleAddToCart(product._id)}
+                                    onClick={() => handleAddToCart(product.id || product._id)}
                                     style={{
-                                        background: '#000',
-                                        color: '#fff',
+                                        background: '#9b59b6',
+                                        color: 'white',
                                         border: 'none',
                                         padding: '10px 20px',
                                         borderRadius: '5px',
-                                        fontWeight: 'bold'
+                                        fontWeight: 'bold',
+                                        cursor: 'pointer'
                                     }}
                                 >
-                                    В корзину
+                                    🛒 В корзину
                                 </button>
                             </div>
                         </div>

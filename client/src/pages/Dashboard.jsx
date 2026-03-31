@@ -44,7 +44,7 @@ const Dashboard = () => {
 
     const calculateTotal = () => {
         return cart.reduce((total, item) => {
-            return total + (item.productId?.price || 0) * item.quantity;
+            return total + (item.Product?.price || 0) * item.quantity;
         }, 0).toFixed(2);
     };
 
@@ -85,7 +85,8 @@ const Dashboard = () => {
                                 color: 'white',
                                 border: 'none',
                                 padding: '8px 15px',
-                                borderRadius: '5px'
+                                borderRadius: '5px',
+                                cursor: 'pointer'
                             }}
                         >
                             Очистить
@@ -99,10 +100,10 @@ const Dashboard = () => {
                     <p style={{ color: '#666' }}>Корзина пуста</p>
                 ) : (
                     <>
-                        <ul style={{ listStyle: 'none' }}>
+                        <ul style={{ listStyle: 'none', padding: 0 }}>
                             {cart.map(item => (
                                 <li
-                                    key={item._id}
+                                    key={item.id}
                                     style={{
                                         display: 'flex',
                                         justifyContent: 'space-between',
@@ -112,19 +113,20 @@ const Dashboard = () => {
                                     }}
                                 >
                                     <div>
-                                        <strong>{item.productId?.title || 'Товар удалён'}</strong>
+                                        <strong>{item.Product?.title || 'Товар удалён'}</strong>
                                         <p style={{ color: '#666', fontSize: '14px' }}>
-                                            x{item.quantity} • ${item.productId?.price || 0}
+                                            x{item.quantity} • ${item.Product?.price || 0}
                                         </p>
                                     </div>
                                     <button
-                                        onClick={() => handleRemoveFromCart(item._id)}
+                                        onClick={() => handleRemoveFromCart(item.id)}
                                         style={{
                                             background: '#e74c3c',
                                             color: 'white',
                                             border: 'none',
                                             padding: '8px 15px',
-                                            borderRadius: '5px'
+                                            borderRadius: '5px',
+                                            cursor: 'pointer'
                                         }}
                                     >
                                         Удалить
