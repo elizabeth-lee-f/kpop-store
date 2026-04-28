@@ -1,16 +1,50 @@
-# React + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 👩‍💻 Автор
 
-Currently, two official plugins are available:
+Рябинина Елизавета
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+# 🇰🇷 K-Pop Store
 
-## React Compiler
+Современный интернет-магазин мерча K-Pop артистов с полноценным бэкендом, базой данных и чатом поддержки в реальном времени. Проект демонстрирует навыки Fullstack-разработки, работы с компонентной архитектурой React и организации серверной логики.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## ✨ Особенности проекта
 
-## Expanding the ESLint configuration
+- 🔐 **Реальная авторизация**: Регистрация, вход, защита роутов через JWT токены.
+- 🛒 **Корзина товаров**: Добавление, удаление, подсчет итоговой суммы, оформление заказа с модальным окном подтверждения.
+- 💬 **Чат поддержки**: Обмен сообщениями в реальном времени через WebSocket (Socket.io).
+- ☁️ **Cloudinary Integration**: Загрузка и оптимизация изображений товаров в облачное хранилище.
+- ⚙️ **Админ-панель**: Полный CRUD для товаров (создание, чтение, обновление, удаление).
+- 🏗️ **Модульная архитектура**: Разделение бизнес-логики на сервисы (Service Layer Pattern).
+- 🗄️ **База данных**: Надежное хранение данных в PostgreSQL с использованием Sequelize ORM.
+- 📱 **Адаптивность**: Полная поддержка мобильных устройств, планшетов и десктопов.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## 🛠 Стек технологий
+
+| Frontend | Backend | Database & Tools |
+| :--- | :--- | :--- |
+| React (Hooks) | Node.js & Express | PostgreSQL |
+| Vite | Socket.io | Sequelize ORM |
+| React Router DOM | JWT & Bcryptjs | Cloudinary |
+| Axios | Multer | Git |
+| Context API | CORS | Dotenv |
+
+## 🚀 Инструкция по запуску
+
+Следуйте этим шагам, чтобы запустить проект локально.
+
+### Шаг 1: Подготовка
+Убедитесь, что у вас установлены:
+- [Node.js](https://nodejs.org/) (версия 18+)
+- [PostgreSQL](https://www.postgresql.org/) (локально или облачный инстанс)
+
+### Шаг 2: Установка зависимостей
+Откройте терминал в корневой папке проекта `kpop-store`:
+
+```bash
+# Установка зависимостей для Клиента (Frontend)
+cd client
+npm install
+
+# Установка зависимостей для Сервера (Backend)
+cd ../server
+npm install
