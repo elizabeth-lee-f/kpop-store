@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const productService = require('../services/productService'); // <-- Импортируем сервис
+const productService = require('../services/product'); // <-- Импортируем сервис
 const { verifyAdmin, verifyToken } = require('../middleware/authMiddleware');
 
 // Получить все товары (Можно оставить публичным или добавить verifyToken по требованию)
